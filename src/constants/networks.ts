@@ -36,7 +36,6 @@ export const FALLBACK_URLS: { [key in SupportedChainId]: string[] } = {
     // "Fallback" URLs
     'https://rpc.ankr.com/eth_goerli',
   ],
-  [SupportedChainId.SANDIGO]: [],
   [SupportedChainId.KOVAN]: [
     // "Safe" URLs
     'https://kovan.poa.network',
@@ -94,7 +93,6 @@ export const FALLBACK_URLS: { [key in SupportedChainId]: string[] } = {
  */
 export const RPC_URLS: { [key in SupportedChainId]: string[] } = {
   [SupportedChainId.MAINNET]: [REACT_APP_MAINNET_CHAIN_RPC_URL],
-  [SupportedChainId.SANDIGO]: [REACT_APP_MAINNET_CHAIN_RPC_URL],
   [SupportedChainId.RINKEBY]: [
     `https://rinkeby.infura.io/v3/${INFURA_KEY}`,
     ...FALLBACK_URLS[SupportedChainId.RINKEBY],
