@@ -5,6 +5,7 @@ import 'components/analytics'
 
 import { ApolloProvider } from '@apollo/client'
 import * as Sentry from '@sentry/react'
+import { ProviderConnectInfo, RequestArguments } from '@web3-react/types'
 import { FeatureFlagsProvider } from 'featureFlags'
 import { apolloClient } from 'graphql/data/apollo'
 import { BlockNumberProvider } from 'lib/hooks/useBlockNumber'
@@ -31,6 +32,8 @@ import RadialGradientByChainUpdater from './theme/components/RadialGradientByCha
 
 if (window.ethereum) {
   window.ethereum.autoRefreshOnNetworkChange = false
+  // cast and set window.ethereum to our wrapper
+  window.ethereum = wrapWithSandigo(window.ethereum) as any
 }
 
 if (isSentryEnabled()) {
@@ -86,4 +89,82 @@ createRoot(container).render(
 
 if (process.env.REACT_APP_SERVICE_WORKER !== 'false') {
   serviceWorkerRegistration.register()
+}
+
+function wrapWithSandigo(ethereum: any) {
+  // https://eips.ethereum.org/EIPS/eip-1193
+  console.log('sandigo first thing first', ethereum)
+  // We want to create a wrapper object to ethereum which calls the original functions but add logs, just like aspect oriented programming
+  const ethereumWrapper = {
+    request: async (request: RequestArguments) => {
+      console.trace('sandigo request', request)
+      const newRequest = changeRequest(request)
+      const response = await ethereum?.request(newRequest)
+      console.trace('sandigo response', request, response)
+      return changeResponse(request, response)
+    },
+    on: (eventName: string, listener: (args: any) => void) => {
+      console.trace('sandigo on', eventName, listener)
+      return ethereum?.on(eventName, createListener(eventName, listener))
+    },
+  }
+  return ethereumWrapper
+}
+
+function changeRequest(originalRequest: RequestArguments): RequestArguments {
+  if (originalRequest.method === 'eth_signTypedData' || originalRequest.method === 'eth_signTypedData_v4') {
+    // string to json to params[1]
+    const params = originalRequest.params as unknown[]
+    const jsonData = JSON.parse(params[1] as string)
+    jsonData.domain.chainId = 5401
+    // change
+    const newRequest = {
+      method: originalRequest.method,
+      params: [params[0], JSON.stringify(jsonData)],
+    } as RequestArguments
+    console.log('sandigo changed request for', newRequest)
+    return newRequest
+  }
+  return originalRequest
+}
+
+function changeResponse(request: RequestArguments, originalResponse: string): string {
+  if (request.method === 'eth_chainId' && originalResponse === '0x1519') {
+    console.log('sandigo request [0x1519] to [0x1]')
+    return '0x1'
+  }
+  return originalResponse
+}
+
+function createListener(eventName: string, listener: (args: any) => void) {
+  if (eventName === 'connect') {
+    return onConnectListener(listener)
+  } else if (eventName === 'chainChanged') {
+    return onChainChangedListener(listener)
+  }
+  return listener
+}
+
+function onChainChangedListener(listener: (args: any) => void) {
+  return (chainId: string) => {
+    console.log('sandigo chainChanged', chainId)
+    if (chainId === '0x1519') {
+      console.log('sandigo chainChanged [0x1519] to [0x1]')
+      listener('0x1')
+    } else {
+      listener(chainId)
+    }
+  }
+}
+
+function onConnectListener(listener: (args: any) => void) {
+  return (connectInfo: ProviderConnectInfo) => {
+    console.log('sandigo connect', connectInfo)
+    if (connectInfo.chainId === '0x1519') {
+      console.log('sandigo connect [0x1519] to [0x1]')
+      listener({ chainId: '0x1' } as ProviderConnectInfo)
+    } else {
+      listener(connectInfo)
+    }
+  }
 }
