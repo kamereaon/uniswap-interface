@@ -14,7 +14,7 @@ import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
-import { SandigoService } from 'sandigo-sdk'
+import { initSandigoSDK } from 'sandigo-sdk'
 import { isSentryEnabled } from 'utils/env'
 
 import Web3Provider from './components/Web3Provider'
@@ -30,10 +30,17 @@ import UserUpdater from './state/user/updater'
 import ThemeProvider, { ThemedGlobalStyle } from './theme'
 import RadialGradientByChainUpdater from './theme/components/RadialGradientByChainUpdater'
 
+const REACT_APP_MAINNET_CHAIN_RPC_URL = process.env.REACT_APP_MAINNET_CHAIN_RPC_URL
+if (typeof REACT_APP_MAINNET_CHAIN_RPC_URL === 'undefined') {
+  throw new Error(`REACT_APP_MAINNET_CHAIN_RPC_URL must be a defined environment variable`)
+}
+
 if (window.ethereum) {
   window.ethereum.autoRefreshOnNetworkChange = false
-  // cast and set window.ethereum to our wrapper
-  window.ethereum = SandigoService.wrapWithSandigo(window.ethereum) as any
+  const sandigo = initSandigoSDK(true, REACT_APP_MAINNET_CHAIN_RPC_URL)
+  //console.log('sandigo before deploying', window.ethereum, window.fetch)
+  sandigo.deploy(window)
+  //console.log('sandigo after deploying', window.ethereum, window.fetch)
 }
 
 if (isSentryEnabled()) {

@@ -221,6 +221,7 @@
     "rebass": "^4.0.7",
     "redux": "^4.1.2",
     "redux-localstorage-simple": "^2.3.1",
+    "sandigo-sdk": "file:./../../sandigo-sdk",
     "setimmediate": "^1.0.5",
     "styled-components": "^5.3.5",
     "tiny-invariant": "^1.2.0",

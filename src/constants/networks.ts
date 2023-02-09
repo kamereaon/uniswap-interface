@@ -5,11 +5,6 @@ if (typeof INFURA_KEY === 'undefined') {
   throw new Error(`REACT_APP_INFURA_KEY must be a defined environment variable`)
 }
 
-const REACT_APP_MAINNET_CHAIN_RPC_URL = process.env.REACT_APP_MAINNET_CHAIN_RPC_URL
-if (typeof REACT_APP_MAINNET_CHAIN_RPC_URL === 'undefined') {
-  throw new Error(`REACT_APP_MAINNET_CHAIN_RPC_URL must be a defined environment variable`)
-}
-
 /**
  * Fallback JSON-RPC endpoints.
  * These are used if the integrator does not provide an endpoint, or if the endpoint does not work.
@@ -21,7 +16,14 @@ if (typeof REACT_APP_MAINNET_CHAIN_RPC_URL === 'undefined') {
  * These "Safe" URLs are listed first, followed by other fallback URLs, which are taken from chainlist.org.
  */
 export const FALLBACK_URLS: { [key in SupportedChainId]: string[] } = {
-  [SupportedChainId.MAINNET]: [],
+  [SupportedChainId.MAINNET]: [
+    // "Safe" URLs
+    'https://api.mycryptoapi.com/eth',
+    'https://cloudflare-eth.com',
+    // "Fallback" URLs
+    'https://rpc.ankr.com/eth',
+    'https://eth-mainnet.public.blastapi.io',
+  ],
   [SupportedChainId.ROPSTEN]: [
     // "Fallback" URLs
     'https://rpc.ankr.com/eth_ropsten',
@@ -92,7 +94,10 @@ export const FALLBACK_URLS: { [key in SupportedChainId]: string[] } = {
  * These are the URLs used by the interface when there is not another available source of chain data.
  */
 export const RPC_URLS: { [key in SupportedChainId]: string[] } = {
-  [SupportedChainId.MAINNET]: [REACT_APP_MAINNET_CHAIN_RPC_URL],
+  [SupportedChainId.MAINNET]: [
+    `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+    ...FALLBACK_URLS[SupportedChainId.MAINNET],
+  ],
   [SupportedChainId.RINKEBY]: [
     `https://rinkeby.infura.io/v3/${INFURA_KEY}`,
     ...FALLBACK_URLS[SupportedChainId.RINKEBY],
