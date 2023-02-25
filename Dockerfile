@@ -14,7 +14,7 @@ COPY . .
 
 #EXPOSE 3000
 
-#ENV REACT_APP_MAINNET_CHAIN_RPC_URL=http://localhost:5000
+#ENV REACT_APP_SANDIGO_DOMAIN=http://localhost:5000
 
 #RUN yarn build
 

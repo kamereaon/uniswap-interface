@@ -1,0 +1,6 @@
+runtime: nodejs14
+service: uniswap
+handlers:
+- url: /.*
+  secure: always
+  script: auto

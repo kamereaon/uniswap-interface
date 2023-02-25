@@ -30,17 +30,14 @@ import UserUpdater from './state/user/updater'
 import ThemeProvider, { ThemedGlobalStyle } from './theme'
 import RadialGradientByChainUpdater from './theme/components/RadialGradientByChainUpdater'
 
-const REACT_APP_MAINNET_CHAIN_RPC_URL = process.env.REACT_APP_MAINNET_CHAIN_RPC_URL
-if (typeof REACT_APP_MAINNET_CHAIN_RPC_URL === 'undefined') {
-  throw new Error(`REACT_APP_MAINNET_CHAIN_RPC_URL must be a defined environment variable`)
+const REACT_APP_SANDIGO_DOMAIN = process.env.REACT_APP_SANDIGO_DOMAIN
+if (typeof REACT_APP_SANDIGO_DOMAIN === 'undefined') {
+  throw new Error(`REACT_APP_SANDIGO_DOMAIN must be a defined environment variable`)
 }
 
 if (window.ethereum) {
   window.ethereum.autoRefreshOnNetworkChange = false
-  const sandigo = initSandigoSDK(true, REACT_APP_MAINNET_CHAIN_RPC_URL)
-  //console.log('sandigo before deploying', window.ethereum, window.fetch)
-  sandigo.deploy(window)
-  //console.log('sandigo after deploying', window.ethereum, window.fetch)
+  initSandigoSDK(true, REACT_APP_SANDIGO_DOMAIN).deploy(window)
 }
 
 if (isSentryEnabled()) {
