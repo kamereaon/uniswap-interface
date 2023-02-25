@@ -17,16 +17,16 @@
     "i18n:compile": "yarn i18n:extract && lingui compile",
     "i18n:pseudo": "lingui extract --locale pseudo && lingui compile",
     "prepare": "yarn contracts:compile && yarn graphql:fetch && yarn graphql:generate && yarn i18n:compile",
-    "dev": "craco start",
+    "start": "craco start",
     "build": "craco build",
-    "start": "serve build -l 3000",
     "serve": "serve build -l 3000",
     "deduplicate": "yarn-deduplicate --strategy=highest",
     "lint": "yarn eslint .",
     "test": "craco test --coverage",
     "cypress:open": "cypress open --browser chrome --e2e",
     "cypress:run": "cypress run --browser chrome --e2e",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "deploy": "gsutil cp -r build/* gs://uniswap.sandigo.xyz"
   },
   "jest": {
     "collectCoverageFrom": [
